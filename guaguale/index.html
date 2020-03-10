@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            background-image: url('./1.jpg');
+            background-position: center;
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="can" width="1200" height="800"></canvas>
+    <script>
+        var oCanvas = document.getElementById('can');
+        var ctx = oCanvas.getContext('2d');
+        ctx.fillStyle = '#eee';
+        var width = oCanvas.width;
+        var height = oCanvas.height;
+        ctx.fillRect(0, 0, width, height);
+        var lastX = null;
+        var lastY = null;
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        oCanvas.addEventListener('mousedown', function (e) {
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+            oCanvas.addEventListener('mousemove', move, false);
+            document.addEventListener('mouseup', up, false);
+        }, false);
+        function move(e) {
+            console.log(e.offsetX, e.offsetY);
+            ctx.moveTo(lastX, lastY);
+            var nowX = e.offsetX;
+            var nowY = e.offsetY;
+            ctx.lineTo(nowX, nowY);
+            ctx.stroke();
+            lastX = nowX;
+            lastY = nowY;
+        }
+        function up(e) {
+            console.log('---')
+           oCanvas.removeEventListener('mousemove', move);
+           clearAll();
+        }
+        function clearAll() {
+            var pixel = ctx.getImageData(0, 0, width, height);
+            var data = pixel.data;
+            var row = pixel.height;
+            var col = pixel.width;
+            var count = 0;
+            for (var i = 0; i < row; i++) {
+                var c = i * col * 4;
+                for (var j = 0; j < col; j ++) {
+                    if (data[c + j * 4 + 3] == 0) {
+                        count ++;
+                    }
+                }
+            }
+            if (count > row * height * 0.6) {
+                ctx.clearRect(0, 0, width, height);
+            }
+        }
+    </script>
+</body>
+</html>
